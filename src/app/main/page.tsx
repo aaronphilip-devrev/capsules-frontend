@@ -3,6 +3,15 @@
 import { useEffect, useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from 'next/image';
+
+interface TimeCapsule {
+  _id: string;
+  title: string;
+  content: string;
+  image?: string;
+  createdAt: string;
+}
 
 const isAuthenticated = () => {
   if (typeof window !== "undefined") {
@@ -13,7 +22,7 @@ const isAuthenticated = () => {
 
 export default function MainPage() {
   const router = useRouter();
-  const [capsules, setCapsules] = useState([]);
+  const [capsules, setCapsules] = useState<TimeCapsule[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState("");
@@ -30,17 +39,17 @@ export default function MainPage() {
 
   const fetchCapsules = async () => {
     try {
-      const response = await fetch("http://localhost:5000/timecapsules", {
+      const response = await fetch('http://localhost:5000/timecapsules', {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("userId")}`,
-        },
+          'Authorization': `Bearer ${localStorage.getItem('userId')}`
+        }
       });
       if (response.ok) {
-        const data = await response.json();
+        const data: TimeCapsule[] = await response.json();
         setCapsules(data);
       }
     } catch (error) {
-      console.error("Error fetching capsules:", error);
+      console.error('Error fetching capsules:', error);
     } finally {
       setIsLoading(false);
     }
@@ -102,7 +111,7 @@ export default function MainPage() {
               ⏳
             </span>
             <span className="text-lg sm:text-xl font-semibold text-white">
-              Nitya and Aaron's Time Capsule
+              Nitya and Aaron&apos;s Time Capsule
             </span>
           </Link>
           <button
@@ -200,11 +209,13 @@ export default function MainPage() {
                 Created: {new Date(capsule.createdAt).toLocaleDateString()}
               </p>
               {capsule.image && (
-                <div className="mb-2">
-                  <img
+                <div className="mb-2 relative w-full h-48">
+                  <Image
                     src={`data:image/jpeg;base64,${capsule.image}`}
                     alt={capsule.title}
-                    className="w-full h-auto rounded-md"
+                    fill
+                    style={{ objectFit: 'cover' }}
+                    className="rounded-md"
                   />
                 </div>
               )}
